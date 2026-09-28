@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "langchain-urlpipe"
+version = "0.1.0"
+description = "LangChain tools, toolkit and document loader for URLpipe: read any web page as Markdown, or get its metadata, console errors or a Lighthouse audit, rendered in real Chrome."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "URLpipe", email = "contact@urlpipe.dev" }]
+maintainers = [{ name = "URLpipe", email = "contact@urlpipe.dev" }]
+keywords = ["langchain", "urlpipe", "markdown", "lighthouse", "web scraping", "llm", "agents", "rag"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Internet :: WWW/HTTP",
+  "Typing :: Typed",
+]
+dependencies = ["langchain-core>=1.0,<2", "urlpipe>=0.1.0,<1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "langchain-tests>=1.0,<2", "mypy>=1.10"]
+
+[project.urls]
+Homepage = "https://urlpipe.dev/integrations/langchain"
+Documentation = "https://urlpipe.dev/docs/client-libraries"
+Source = "https://github.com/URLpipe/langchain-urlpipe"
+Changelog = "https://github.com/URLpipe/langchain-urlpipe/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["langchain_urlpipe"]
+
+[tool.hatch.build.targets.sdist]
+include = ["langchain_urlpipe", "tests", "README.md", "CHANGELOG.md", "LICENSE", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.mypy]
+strict = true
+files = ["langchain_urlpipe", "tests"]
