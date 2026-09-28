@@ -11,11 +11,27 @@ import urlpipe
 from langchain_core.tools import ToolException
 from pydantic import SecretStr
 
+try:
+    from importlib import metadata as _metadata
+
+    _VERSION = _metadata.version("langchain-urlpipe")
+except Exception:  # pragma: no cover - not installed as a distribution
+    _VERSION = "dev"
+
+# Named in every request's User-Agent, in front of the client's own, so the
+# API can tell LangChain traffic apart: "langchain-urlpipe/0.1.1 urlpipe-python/0.2.0".
+USER_AGENT = f"langchain-urlpipe/{_VERSION}"
+
+
+def _with_user_agent(client_kwargs: Mapping[str, Any]) -> dict[str, Any]:
+    """The client arguments, with this package's User-Agent unless the caller set one."""
+    return {"user_agent": USER_AGENT, **client_kwargs}
+
 
 def build_client(api_key: SecretStr | None, client_kwargs: Mapping[str, Any]) -> urlpipe.Client:
     """A sync client. With no ``api_key`` it reads ``URLPIPE_API_KEY`` and raises
     ``urlpipe.ConfigurationError`` if that is unset too."""
-    return urlpipe.Client(_secret(api_key), **client_kwargs)
+    return urlpipe.Client(_secret(api_key), **_with_user_agent(client_kwargs))
 
 
 @asynccontextmanager
@@ -34,7 +50,7 @@ async def async_session(
     if async_client is not None:
         yield async_client
         return
-    async with urlpipe.AsyncClient(_secret(api_key), **client_kwargs) as client:
+    async with urlpipe.AsyncClient(_secret(api_key), **_with_user_agent(client_kwargs)) as client:
         yield client
 
 

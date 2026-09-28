@@ -68,6 +68,8 @@ def test_read_page_returns_the_markdown(server: StubServer, connection: dict[str
     assert request.path == "/markdown"
     assert request.json == {"url": PAGE, "sync": True}
     assert request.headers["authorization"] == f"Bearer {API_KEY}"
+    assert request.headers["user-agent"].startswith("langchain-urlpipe/")
+    assert " urlpipe-python/" in request.headers["user-agent"]
 
 
 def test_max_age_is_sent_as_given(server: StubServer, connection: dict[str, Any], call: Any) -> None:

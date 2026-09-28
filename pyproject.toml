@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langchain-urlpipe"
-version = "0.1.0"
+version = "0.1.1"
 description = "LangChain tools, toolkit and document loader for URLpipe: read any web page as Markdown, or get its metadata, console errors or a Lighthouse audit, rendered in real Chrome."
 readme = "README.md"
 license = "MIT"
@@ -28,7 +28,7 @@ classifiers = [
   "Topic :: Internet :: WWW/HTTP",
   "Typing :: Typed",
 ]
-dependencies = ["langchain-core>=1.0,<2", "urlpipe>=0.1.0,<1"]
+dependencies = ["langchain-core>=1.0,<2", "urlpipe>=0.2.0,<1"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "langchain-tests>=1.0,<2", "mypy>=1.10"]

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Requests carry `langchain-urlpipe/<version>` in their User-Agent, in front of the `urlpipe` client's own. Needs `urlpipe` 0.2.0.
+
 ## 0.1.0 — 2026-09-28
 
 The first release.
