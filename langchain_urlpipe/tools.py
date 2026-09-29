@@ -37,16 +37,19 @@ class UrlpipeReadPage(UrlpipeBaseTool):
 
 
 class UrlpipePageMetadata(UrlpipeBaseTool):
-    """A page's metadata: title, description, language, main image, author,
-    publication date and feed, as a dict."""
+    """A page's metadata as a dict, with the same keys for every page: title,
+    description, site name, language, authors, dates, share image, icons, feeds
+    and more."""
 
     name: str = "urlpipe_page_metadata"
     description: str = (
-        "Get a web page's metadata as JSON: title, description, language, main "
-        "image URL, favicon URL, author, publication date and RSS/Atom feed URL. "
+        "Get a web page's metadata as JSON, with the same keys for every page: "
+        "title, description, site_name, language, authors (name and link), "
+        "published_at, modified_at, image (url and size), favicon_url, feeds, "
+        "keywords, canonical_url and more; null where the page declares nothing. "
         "Use it to cite, date or preview a link, or to find a site's feed, without "
-        "reading the whole page. Costs 5 credits, so when you need the content "
-        "itself use urlpipe_read_page (1 credit) instead."
+        "reading the whole page. Costs 1 credit; when you need the content itself, "
+        "use urlpipe_read_page instead."
     )
     operation: ClassVar[str] = "meta"
 

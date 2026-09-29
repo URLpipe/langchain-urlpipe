@@ -91,7 +91,12 @@ def test_read_page_says_when_a_page_has_no_text(
 
 
 def test_page_metadata_returns_a_dict(server: StubServer, connection: dict[str, Any], call: Any) -> None:
-    meta = {"title": "Pricing", "language": "en", "feed_url": "https://example.com/feed.xml"}
+    meta = {
+        "title": "Pricing",
+        "language": "en",
+        "authors": [{"name": "Jane Doe", "url": None, "profiles": []}],
+        "feeds": [{"url": "https://example.com/feed.xml", "type": "application/rss+xml", "title": None}],
+    }
     server.reply(body=meta)
 
     result = call(UrlpipePageMetadata(**connection), {"url": PAGE, "max_age": 0})

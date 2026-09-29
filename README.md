@@ -27,7 +27,7 @@ Every tool, the toolkit and the loader read `URLPIPE_API_KEY`, or take `api_key=
 | Tool | Name the model sees | What it returns | Credits |
 |---|---|---|---|
 | `UrlpipeReadPage` | `urlpipe_read_page` | the page's main content as Markdown | 1 |
-| `UrlpipePageMetadata` | `urlpipe_page_metadata` | title, description, language, main image, author, publication date, feed | 5 |
+| `UrlpipePageMetadata` | `urlpipe_page_metadata` | title, description, site name, language, authors, dates, share image, icons, feeds and more — the same keys for every page | 1 |
 | `UrlpipeConsoleErrors` | `urlpipe_console_errors` | the errors, warnings and uncaught exceptions the page logs | 1 |
 | `UrlpipeLighthouse` | `urlpipe_lighthouse` | Lighthouse scores (0–100) and key metrics, on `mobile` or `desktop` | 2 |
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `urlpipe_page_metadata` returns the fixed shape of `/meta` — `authors`, `published_at`, `image`, `feeds` and the rest, every key always present — and tells the model it costs 1 credit.
+
 ## 0.1.1
 
 - Requests carry `langchain-urlpipe/<version>` in their User-Agent, in front of the `urlpipe` client's own. Needs `urlpipe` 0.2.0.
