@@ -19,7 +19,7 @@ except Exception:  # pragma: no cover - not installed as a distribution
     _VERSION = "dev"
 
 # Named in every request's User-Agent, in front of the client's own, so the
-# API can tell LangChain traffic apart: "langchain-urlpipe/0.1.1 urlpipe-python/0.2.0".
+# API can tell LangChain traffic apart: "langchain-urlpipe/0.2.0 urlpipe-python/0.3.0".
 USER_AGENT = f"langchain-urlpipe/{_VERSION}"
 
 
