@@ -1,5 +1,6 @@
-"""URLpipe tools: read a page, get its metadata, list its console errors and
-run a Lighthouse audit, each rendered in real Chrome."""
+"""URLpipe tools: read a page, get its metadata, read data off it into your own
+fields, detect what it is built with, list its console errors and run a
+Lighthouse audit, each rendered in real Chrome."""
 
 from __future__ import annotations
 
@@ -55,6 +56,111 @@ class UrlpipePageMetadata(UrlpipeBaseTool):
 
     def _render(self, data: Any) -> Any:
         return dict(data)
+
+
+class UrlpipeExtractField(BaseModel):
+    """One value to read off the page."""
+
+    name: str = Field(
+        description="The key this value has in the result: letters, digits and underscores."
+    )
+    type: Literal[
+        "string", "number", "integer", "boolean", "date", "datetime", "url", "email", "object", "array"
+    ] = Field(default="string", description="The type of the value.")
+    description: str | None = Field(
+        default=None,
+        description=(
+            "Which value is meant, in plain words, such as 'the current price, "
+            "without the currency'. Up to 300 characters."
+        ),
+    )
+    fields: list[dict[str, Any]] | None = Field(
+        default=None,
+        description="For type 'object': its own fields, each written like this one.",
+    )
+    items: dict[str, Any] | None = Field(
+        default=None,
+        description=(
+            "For type 'array': what each item is, such as {'type': 'string'} or "
+            "{'type': 'object', 'fields': [{'name': 'color', 'type': 'string'}]}."
+        ),
+    )
+
+
+class UrlpipeExtractDataInput(UrlpipeInput):
+    """The arguments of :class:`UrlpipeExtractData`."""
+
+    fields: list[UrlpipeExtractField] = Field(
+        min_length=1,
+        description=(
+            "The values to read off the page, up to 50 counting nested ones. The "
+            "result has exactly these names, in this order."
+        ),
+    )
+    instructions: str | None = Field(
+        default=None,
+        description=(
+            "Guidance that applies to every field, such as 'prices in euros' or "
+            "'the first product only'. Up to 1,000 characters."
+        ),
+    )
+
+
+class UrlpipeExtractData(UrlpipeBaseTool):
+    """Data read off a page with AI, as a dict with the fields you name.
+
+    >>> tool = UrlpipeExtractData()  # reads URLPIPE_API_KEY
+    >>> tool.invoke({
+    ...     "url": "https://example.com/shoe",
+    ...     "fields": [{"name": "name"}, {"name": "price", "type": "number"}],
+    ... })
+    {'name': 'Trail Shoe', 'price': 89.5}
+    """
+
+    name: str = "urlpipe_extract_data"
+    description: str = (
+        "Read specific values off a web page into the fields you name, as JSON: a "
+        "product's name and price, an article's author and date, a list of job "
+        "postings with their titles and locations. The page is loaded in a real "
+        "Chrome browser and read after its JavaScript has run. The result has "
+        "exactly your fields, in your order; a value the page does not give is "
+        "null, never guessed. Costs 24 credits, so use it when you need the same "
+        "fields as data, for instance across many pages; to read or reason about "
+        "one page, urlpipe_read_page costs 1."
+    )
+    args_schema: type[BaseModel] = UrlpipeExtractDataInput
+    operation: ClassVar[str] = "extract"
+
+    def _arguments(self, options: dict[str, Any]) -> dict[str, Any]:
+        fields = [
+            field.model_dump(exclude_none=True) if isinstance(field, BaseModel) else dict(field)
+            for field in options["fields"]
+        ]
+        arguments: dict[str, Any] = {"fields": fields}
+        if options.get("instructions"):
+            arguments["instructions"] = options["instructions"]
+        return arguments
+
+    def _render(self, data: Any) -> Any:
+        return dict(data)
+
+
+class UrlpipeTechnologies(UrlpipeBaseTool):
+    """What a site is built with, compacted: each technology's name, version,
+    categories and how certain the detection is."""
+
+    name: str = "urlpipe_technologies"
+    description: str = (
+        "Detect what a website is built with: its CMS or shop platform, JavaScript "
+        "frameworks, analytics, tag managers, CDN and web server, with versions "
+        "where the page shows them. Returns each technology's name, version, "
+        "categories and a confidence from 0 to 100, most certain first. Use it to "
+        "profile a site or check which tools it runs. Costs 1 credit."
+    )
+    operation: ClassVar[str] = "technologies"
+
+    def _render(self, data: Any) -> Any:
+        return compact_technologies(data)
 
 
 class UrlpipeConsoleErrors(UrlpipeBaseTool):
@@ -125,6 +231,25 @@ def compact_lighthouse(report: Mapping[str, Any]) -> dict[str, Any]:
             for name, metric in metrics.items()
             if metric is not None
         },
+    }
+
+
+def compact_technologies(result: Mapping[str, Any]) -> dict[str, Any]:
+    """Keep what a model needs from a technologies result: what each one is,
+    not how it was detected."""
+    return {
+        "final_url": result.get("final_url"),
+        "technologies": [
+            {
+                "name": technology.get("name"),
+                "version": technology.get("version"),
+                "categories": [
+                    category.get("name") for category in technology.get("categories") or []
+                ],
+                "confidence": technology.get("confidence"),
+            }
+            for technology in result.get("technologies") or []
+        ],
     }
 
 

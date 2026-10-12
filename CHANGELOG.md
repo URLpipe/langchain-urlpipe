@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- `UrlpipeExtractData` (`urlpipe_extract_data`): data read off a page with AI, into the fields the agent names. 24 credits.
+- `UrlpipeTechnologies` (`urlpipe_technologies`): what a site is built with, with versions. 1 credit.
+- `UrlpipeToolkit` hands out all six tools. Needs `urlpipe` 0.3.0.
+
 ## 0.2.0
 
 - `urlpipe_page_metadata` returns the fixed shape of `/meta` — `authors`, `published_at`, `image`, `feeds` and the rest, every key always present — and tells the model it costs 1 credit.

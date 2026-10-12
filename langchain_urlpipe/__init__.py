@@ -1,5 +1,6 @@
 """LangChain integration for URLpipe: read any web page as Markdown, get its
-metadata, console errors or a Lighthouse audit, rendered in real Chrome.
+metadata, data in your own fields, its technologies, console errors or a
+Lighthouse audit, rendered in real Chrome.
 
 Docs: https://urlpipe.dev/integrations/langchain
 """
@@ -10,9 +11,11 @@ from langchain_urlpipe.document_loaders import UrlpipeLoader
 from langchain_urlpipe.toolkits import UrlpipeToolkit
 from langchain_urlpipe.tools import (
     UrlpipeConsoleErrors,
+    UrlpipeExtractData,
     UrlpipeLighthouse,
     UrlpipePageMetadata,
     UrlpipeReadPage,
+    UrlpipeTechnologies,
 )
 
 try:
@@ -23,10 +26,12 @@ del metadata
 
 __all__ = [
     "UrlpipeConsoleErrors",
+    "UrlpipeExtractData",
     "UrlpipeLighthouse",
     "UrlpipeLoader",
     "UrlpipePageMetadata",
     "UrlpipeReadPage",
+    "UrlpipeTechnologies",
     "UrlpipeToolkit",
     "__version__",
 ]

@@ -74,7 +74,9 @@ class UrlpipeBaseTool(BaseTool):
     ) -> Any:
         assert self.client is not None
         try:
-            response = getattr(self.client, self.operation)(url, max_age=max_age, **options)
+            response = getattr(self.client, self.operation)(
+                url, max_age=max_age, **self._arguments(options)
+            )
         except urlpipe.UrlpipeError as error:
             raise tool_error(error) from error
         return self._output(response)
@@ -88,7 +90,9 @@ class UrlpipeBaseTool(BaseTool):
     ) -> Any:
         try:
             async with async_session(self.async_client, self.api_key, self.client_kwargs) as client:
-                response = await getattr(client, self.operation)(url, max_age=max_age, **options)
+                response = await getattr(client, self.operation)(
+                    url, max_age=max_age, **self._arguments(options)
+                )
         except urlpipe.UrlpipeError as error:
             raise tool_error(error) from error
         return self._output(response)
@@ -99,6 +103,10 @@ class UrlpipeBaseTool(BaseTool):
                 f"URLpipe is still working on this page. Its result token is {response.token}."
             )
         return self._render(response.data)
+
+    def _arguments(self, options: dict[str, Any]) -> dict[str, Any]:
+        """The tool's own arguments as the client method takes them."""
+        return options
 
     def _render(self, data: Any) -> Any:
         """Shape the operation's result for the model."""

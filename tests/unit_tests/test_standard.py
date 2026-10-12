@@ -9,9 +9,11 @@ from langchain_tests.unit_tests import ToolsUnitTests
 
 from langchain_urlpipe import (
     UrlpipeConsoleErrors,
+    UrlpipeExtractData,
     UrlpipeLighthouse,
     UrlpipePageMetadata,
     UrlpipeReadPage,
+    UrlpipeTechnologies,
 )
 
 
@@ -41,6 +43,21 @@ class TestUrlpipeReadPage(_Standard):
 
 class TestUrlpipePageMetadata(_Standard):
     tool_class = UrlpipePageMetadata
+
+
+class TestUrlpipeExtractData(_Standard):
+    tool_class = UrlpipeExtractData
+
+    @property
+    def tool_invoke_params_example(self) -> dict[str, Any]:
+        return {
+            "url": "https://example.com",
+            "fields": [{"name": "price", "type": "number"}],
+        }
+
+
+class TestUrlpipeTechnologies(_Standard):
+    tool_class = UrlpipeTechnologies
 
 
 class TestUrlpipeConsoleErrors(_Standard):

@@ -1,4 +1,4 @@
-"""All four URLpipe tools, sharing one client."""
+"""Every URLpipe tool, sharing one client."""
 
 from __future__ import annotations
 
@@ -11,12 +11,20 @@ from pydantic import ConfigDict, Field, SecretStr, model_validator
 from typing_extensions import Self
 
 from ._clients import build_client
-from .tools import UrlpipeConsoleErrors, UrlpipeLighthouse, UrlpipePageMetadata, UrlpipeReadPage
+from .tools import (
+    UrlpipeConsoleErrors,
+    UrlpipeExtractData,
+    UrlpipeLighthouse,
+    UrlpipePageMetadata,
+    UrlpipeReadPage,
+    UrlpipeTechnologies,
+)
 
 
 class UrlpipeToolkit(BaseToolkit):
     """Give an agent every URLpipe tool at once: read a page, get its metadata,
-    list its console errors and run a Lighthouse audit.
+    read data off it into your own fields, detect what it is built with, list
+    its console errors and run a Lighthouse audit.
 
     >>> tools = UrlpipeToolkit().get_tools()  # reads URLPIPE_API_KEY
 
@@ -40,7 +48,7 @@ class UrlpipeToolkit(BaseToolkit):
         return self
 
     def get_tools(self) -> list[BaseTool]:
-        """The four tools, in the order an agent usually needs them."""
+        """The six tools, in the order an agent usually needs them."""
         shared: dict[str, Any] = {
             "api_key": self.api_key,
             "client_kwargs": self.client_kwargs,
@@ -50,6 +58,8 @@ class UrlpipeToolkit(BaseToolkit):
         return [
             UrlpipeReadPage(**shared),
             UrlpipePageMetadata(**shared),
+            UrlpipeExtractData(**shared),
+            UrlpipeTechnologies(**shared),
             UrlpipeConsoleErrors(**shared),
             UrlpipeLighthouse(**shared),
         ]

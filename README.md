@@ -2,7 +2,7 @@
 
 Let your LangChain agents read any web page, JavaScript sites included, and load pages into your RAG pipeline as clean Markdown.
 
-[URLpipe](https://urlpipe.dev) renders each page in real Chrome before it answers, so a single-page app or a docs site built with JavaScript comes back with its content, where a plain HTTP fetch gets an empty shell. This package gives you four LangChain tools, a toolkit and a document loader, built on the official [`urlpipe`](https://pypi.org/project/urlpipe/) Python client.
+[URLpipe](https://urlpipe.dev) renders each page in real Chrome before it answers, so a single-page app or a docs site built with JavaScript comes back with its content, where a plain HTTP fetch gets an empty shell. This package gives you six LangChain tools, a toolkit and a document loader, built on the official [`urlpipe`](https://pypi.org/project/urlpipe/) Python client.
 
 ## Install
 
@@ -28,6 +28,8 @@ Every tool, the toolkit and the loader read `URLPIPE_API_KEY`, or take `api_key=
 |---|---|---|---|
 | `UrlpipeReadPage` | `urlpipe_read_page` | the page's main content as Markdown | 1 |
 | `UrlpipePageMetadata` | `urlpipe_page_metadata` | title, description, site name, language, authors, dates, share image, icons, feeds and more — the same keys for every page | 1 |
+| `UrlpipeExtractData` | `urlpipe_extract_data` | the values you name, read off the page with AI: a dict with exactly your fields, `None` where the page gives no value | 24 |
+| `UrlpipeTechnologies` | `urlpipe_technologies` | what the site is built with — CMS, frameworks, analytics, CDN — with versions and a confidence | 1 |
 | `UrlpipeConsoleErrors` | `urlpipe_console_errors` | the errors, warnings and uncaught exceptions the page logs | 1 |
 | `UrlpipeLighthouse` | `urlpipe_lighthouse` | Lighthouse scores (0–100) and key metrics, on `mobile` or `desktop` | 2 |
 
@@ -43,6 +45,23 @@ UrlpipeLighthouse().invoke({"url": "https://example.com", "device": "desktop"})
 # {'url': 'https://example.com', 'device': 'desktop',
 #  'scores': {'performance': 100, 'accessibility': 88, 'best-practices': 100, 'seo': 90},
 #  'metrics': {'first-contentful-paint': {'value': '0.3 s', 'score': 100}, …}}
+```
+
+`UrlpipeExtractData` also takes the `fields` to fill, each with a `name`, a `type` (`string` unless you say otherwise) and a `description` of which value is meant, and optional `instructions` for all of them:
+
+```python
+from langchain_urlpipe import UrlpipeExtractData
+
+UrlpipeExtractData().invoke({
+    "url": "https://example.com/shoe",
+    "fields": [
+        {"name": "name"},
+        {"name": "price", "type": "number", "description": "The current price, without the currency"},
+        {"name": "sizes", "type": "array", "items": {"type": "string"}},
+    ],
+    "instructions": "Prices in euros.",
+})
+# {'name': 'Trail Shoe', 'price': 89.5, 'sizes': ['40', '41', '42']}
 ```
 
 ### In an agent
@@ -81,7 +100,7 @@ When URLpipe cannot load a page, or your credits run out, the tool returns the A
 
 ## Toolkit
 
-`UrlpipeToolkit` hands an agent all four tools at once, sharing one client:
+`UrlpipeToolkit` hands an agent all six tools at once, sharing one client:
 
 ```python
 from langchain.agents import create_agent

@@ -13,9 +13,11 @@ from langchain_core.tools import BaseTool, ToolException
 
 from langchain_urlpipe import (
     UrlpipeConsoleErrors,
+    UrlpipeExtractData,
     UrlpipeLighthouse,
     UrlpipePageMetadata,
     UrlpipeReadPage,
+    UrlpipeTechnologies,
 )
 
 from .conftest import API_KEY, StubServer
@@ -104,6 +106,71 @@ def test_page_metadata_returns_a_dict(server: StubServer, connection: dict[str, 
     assert result == meta
     assert server.requests[0].path == "/meta"
     assert server.requests[0].json == {"url": PAGE, "sync": True, "max_age": 0}
+
+
+def test_extract_data_sends_the_fields_and_returns_a_dict(
+    server: StubServer, connection: dict[str, Any], call: Any
+) -> None:
+    server.reply(body={"name": "Trail Shoe", "price": 89.5, "sizes": ["40", "41"]})
+
+    result = call(
+        UrlpipeExtractData(**connection),
+        {
+            "url": PAGE,
+            "fields": [
+                {"name": "name"},
+                {"name": "price", "type": "number", "description": "The current price"},
+                {"name": "sizes", "type": "array", "items": {"type": "string"}},
+            ],
+            "instructions": "Prices in euros.",
+        },
+    )
+
+    assert result == {"name": "Trail Shoe", "price": 89.5, "sizes": ["40", "41"]}
+    assert server.requests[0].path == "/extract"
+    assert server.requests[0].json == {
+        "url": PAGE,
+        "sync": True,
+        "fields": [
+            {"name": "name", "type": "string"},
+            {"name": "price", "type": "number", "description": "The current price"},
+            {"name": "sizes", "type": "array", "items": {"type": "string"}},
+        ],
+        "instructions": "Prices in euros.",
+    }
+
+
+def test_technologies_are_compacted(server: StubServer, connection: dict[str, Any], call: Any) -> None:
+    server.reply(
+        body={
+            "final_url": "https://example.com/",
+            "technologies": [
+                {
+                    "name": "WordPress",
+                    "slug": "wordpress",
+                    "version": "6.4.2",
+                    "confidence": 100,
+                    "categories": [{"slug": "cms", "name": "CMS"}, {"slug": "blogs", "name": "Blogs"}],
+                    "website": "https://wordpress.org",
+                    "description": "An open-source CMS.",
+                    "cpe": None,
+                    "detected_by": ["meta"],
+                    "implied_by": [],
+                }
+            ],
+        }
+    )
+
+    result = call(UrlpipeTechnologies(**connection), {"url": PAGE})
+
+    assert result == {
+        "final_url": "https://example.com/",
+        "technologies": [
+            {"name": "WordPress", "version": "6.4.2", "categories": ["CMS", "Blogs"], "confidence": 100}
+        ],
+    }
+    assert server.requests[0].path == "/technologies"
+    assert server.requests[0].json == {"url": PAGE, "sync": True}
 
 
 def test_console_errors_are_one_line_each(server: StubServer, connection: dict[str, Any], call: Any) -> None:
