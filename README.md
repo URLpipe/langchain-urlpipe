@@ -132,7 +132,7 @@ docs[0].metadata
 ```
 
 - `operation="markdown"` (the default, 1 credit a page), `"html"` for the HTML after JavaScript ran (1 credit), or `"summarize"` for an AI summary in Markdown (17 credits).
-- `max_age` and `page_options` (`wait_for_selector`, `delay`, `block_ads`, `block_cookie_banners`, `remove_selectors`) go with every page.
+- `max_age` and `page_options` (`wait_for_selector`, `scroll_to_bottom`, `delay`, `block_ads`, `block_cookie_banners`, `block_popups`, `remove_selectors`) go with every page.
 - `continue_on_failure=True` logs and skips a page that fails instead of raising its `urlpipe.UrlpipeError`.
 - `lazy_load()` yields pages one at a time as they arrive; `alazy_load()` and `aload()` load up to `max_concurrency` pages at once (3 by default) and keep the order of your URLs.
 

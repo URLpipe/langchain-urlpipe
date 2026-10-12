@@ -38,8 +38,8 @@ class UrlpipeLoader(BaseLoader):
         max_age: how fresh a stored copy must be, in seconds or as a duration
             such as ``"1 hour"``. ``0`` always loads the page fresh.
         page_options: passed to the API unchanged: ``wait_for_selector``,
-            ``delay``, ``block_ads``, ``block_cookie_banners``,
-            ``remove_selectors``.
+            ``scroll_to_bottom``, ``delay``, ``block_ads``,
+            ``block_cookie_banners``, ``block_popups``, ``remove_selectors``.
         continue_on_failure: log and skip a URL that fails instead of raising
             its ``urlpipe.UrlpipeError``.
         max_concurrency: how many pages :meth:`alazy_load` loads at once.
